@@ -1,0 +1,82 @@
+#include <Servo.h>
+
+const int helmet_closed = 90; 
+const int helmet_opened = 180;
+
+const int leds_A = 6;  // can be front leds
+const int leds_B = 7;  // can be central led
+const int buttonpin = 8;
+const int servo_01_pin = 9;
+//const int servo_02_pin = 10;
+//const int servo_03_pin = 11;
+
+const int speed_step = 150;
+const int speed_blink = 200;
+
+Servo servo_01;  
+//Servo servo_02; 
+//Servo servo_03; 
+ 
+int pos = helmet_closed; 
+int old_pos = pos;
+
+void setup() 
+{ 
+  pinMode(buttonpin, INPUT);
+  pinMode(leds_B, OUTPUT);
+  pinMode(leds_A, OUTPUT);
+  
+  servo_01.attach(servo_01_pin);
+  servo_01.write(pos); 
+  //servo_02.attach(servo_02_pin);
+  //servo_02.write(pos); 
+  //servo_03.attach(servo_03_pin);
+  //servo_03.write(pos); 
+  
+   digitalWrite(leds_B, HIGH);
+   digitalWrite(leds_A, LOW);
+}
+
+void loop() 
+{ 
+  int button_state = digitalRead(buttonpin);
+  if(button_state == HIGH){
+    if(pos == helmet_closed){
+              digitalWrite(leds_B, LOW);
+    } else {
+              digitalWrite(leds_A, LOW);
+      }
+    old_pos = pos; 
+    pos = pos == helmet_closed ? helmet_opened: helmet_closed;
+       
+    if(old_pos < pos){  
+      for (int i=0; i <= 4; i++){
+        digitalWrite(leds_B, HIGH);
+        delay(speed_blink);
+        digitalWrite(leds_B, LOW);
+        delay(speed_blink);
+      }
+      for(int i = old_pos + 1; i <= pos; i++){  
+        servo_01.write(i); 
+        delay(speed_step); 
+      }
+    } else { 
+      for (int i=0; i <= 4; i++){
+        digitalWrite(leds_B, HIGH);
+        delay(speed_blink);
+        digitalWrite(leds_B, LOW);
+        delay(speed_blink);
+      } 
+      for(int i = old_pos - 1; i >= pos; i--){ 
+        servo_01.write(i); 
+        delay(speed_step);
+      }
+    }
+    if(pos == helmet_closed){
+            digitalWrite(leds_B, HIGH);
+        } else {
+            digitalWrite(leds_A, LOW);
+       }
+  } 
+}
+
